@@ -1,0 +1,98 @@
+Passo a passo da jornada de instalação do MongoDB
+
+1 - Fiz todo o procedimento de instalação do site:
+   Entrei no site -> https://www.mongodb.com/
+   Depois fui em "Get MongoDB"
+   Fui enviado para -> https://www.mongodb.com/download-center?jmp=nav e selecionei a opção Community Server -> https://www.mongodb.com/download-center?jmp=nav#community
+   Desci até "Instalation Instructions" -> https://docs.mongodb.com/manual/administration/install-on-linux/ (Inicialmente a url aponta para instalação no Windowns, porém o menu da esquerda da opção pata linux)
+   Escolhi a opção Install on Ubunutu -> https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+   Já no link segui o manual de instalação "Install MongoDB Community Edition Using .deb Packages (Recommended);
+
+2 - Após seguir todos os passos, ao tentar startar o banco, obtive um erro
+lucas-lima@lucas-lima:~$ sudo mongod
+2018-09-22T17:31:27.979-0300 I CONTROL  [main] Automatically disabling TLS 1.0, to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] MongoDB starting : pid=31088 port=27017 dbpath=/data/db 64-bit host=lucas-lima
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] db version v4.0.2
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] git version: fc1573ba18aee42f97a3bb13b67af7d837826b47
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.1.0g  2 Nov 2017
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] allocator: tcmalloc
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] modules: none
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] build environment:
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten]     distmod: ubuntu1804
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten]     distarch: x86_64
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten]     target_arch: x86_64
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] options: {}
+2018-09-22T17:31:27.986-0300 I STORAGE  [initandlisten] exception in initAndListen: NonExistentPath: Data directory /data/db not found., terminating ***
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] now exiting
+2018-09-22T17:31:27.986-0300 I CONTROL  [initandlisten] shutting down with code:100
+   Esse erro foi resolvido com o seguinte comando:
+      $ sudo mkdir -p /data/db
+   Já que ele me dizia que o banco não poderia ser iniciado por não encontrava determinada pasta
+
+3 - Na documentação do site, existe uma paramentro de verificação do funcionamento do banco, no terminal/prompt é necessario que a ultima linha depois da inicialização do banco seja:
+   2018-09-22T17:42:47.439-0300 I NETWORK  [initandlisten] waiting for connections on port 27017
+
+// --------------------------------- Comandos/Links importantes --------------------------------- //
+sudo mongod - Incia o mongod
+CTRL+C  - Para o mongod
+sudo mongo - Incia o MongoDB em linha de comando
+
+https://bognarjunior.wordpress.com/2016/01/30/nodejs-conectando-ao-mongodb-com-mongoose/
+https://www.devmedia.com.br/introducao-ao-mongodb/30792
+https://mongodbwise.wordpress.com/2014/05/22/mongodb-guia-rapido/
+
+// ---------------------------------------------------------------------------------------------- //
+
+*** Comandos iniciais no MongoDB ***
+
+Para criar um banco de dados(Documento) no MongoDB usamos o `use nome_do_banco`, isso não necessariamente significa que o banco está criado, isso por que o MongoDB só considera um banco como banco se houver algum dado nele.
+
+Depois criamos as Collections, que são como as tabelas do banco de dados relacional, com o comando `db.createCollection("nome")`, caso queira listar as Collections uso o comando `db.getCollectionNames()`, caso queira excluir alguma Collections posso usar `db.nome_da_collection.drop()`, é necessario colocar o nome da Collection, pois drop passa a ser um atributo de uma Collection.
+
+Para inserir dados num Documento novo, dentro do banco, usamos a query db.nome_da_collection.save({json}), passamos como paramentro um objeto json.
+
+Operadores de comparação MongoDB
+|---------------------------------------------------------|
+|Equivalente SQL | Operador NoSQL | Nome                  |
+|---------------------------------|-----------------------|
+| =              | $eq            | Equals                |  
+| >              | $gt            | Greater Than          |
+| >=             | $gte           | Greater Than or Equal |
+| <              | $lt            | Less Than             |
+| <=             | $ltr           | Less Than or Equal    |
+| != / <>        | $ne            | Not Equal             |
+|---------------------------------------------------------|
+
+Para consultar os documentos, podemos usar os comandos:
+   `db.nome_da_collection.findOne()` - Exibe o ultimo documento cadastrado
+   `db.nome_da_collection.find()` - Exibe todo o que foi cadastrado, nela podemos acrescentar a função .pretty() a fim de melhorar a visualização.
+
+Podemos acrescentar ainda mais metodos de consulta, passando mais parametros e ultilizando os operadores de comparação:
+      db.alunos.find({ chave_do_campo:{ operador_de_comparação:"valor a ser buscado" } } ).pretty()
+
+Podemos usar operadores logicos AND ou OR:
+   AND:
+      {
+         chave_do_campo:{ 
+                  operador_de_comparação:"valor a ser buscado" 
+                  },
+         chave_do_campo:{ 
+                  operador_de_comparação:"valor a ser buscado" 
+                  }
+      };
+   
+   OR:
+      {
+         $or:[
+               {chave_do_campo:
+                     {operador_de_comparação:"valor a ser buscado" 
+                     }
+               },
+               {chave_do_campo:
+                     {operador_de_comparação:"valor a ser buscado" 
+                     }
+               }
+         ]      
+      }
+
+
